@@ -70,6 +70,7 @@ let state = loadState();
 let selectedId = null;
 let selectedTableIds = new Set();
 let calendarCursor = new Date("2026-07-01T00:00:00");
+let chatState = createChatState();
 
 const form = document.querySelector("#meetingForm");
 const list = document.querySelector("#submissionList");
@@ -83,6 +84,23 @@ const calendarTitle = document.querySelector("#calendarTitle");
 const exportJson = document.querySelector("#exportJson");
 const directInputPanel = document.querySelector("#directInputPanel");
 const listNote = document.querySelector("#listNote");
+const chatMessages = document.querySelector("#chatMessages");
+const chatForm = document.querySelector("#chatForm");
+const chatInput = document.querySelector("#chatInput");
+const chatDraft = document.querySelector("#chatDraft");
+
+const chatSteps = [
+  { key: "submitter", label: "投稿者", question: "まず投稿者のお名前を教えてください。" },
+  { key: "organization", label: "団体", question: "団体名を教えてください。" },
+  { key: "meetingName", label: "例会名", question: "例会名を教えてください。" },
+  { key: "venue", label: "会場", question: "会場名を教えてください。" },
+  { key: "address", label: "住所", question: "住所を教えてください。未定なら「スキップ」で大丈夫です。", optional: true },
+  { key: "date", label: "日付", question: "日付を入力してください。例: 2026-08-05" },
+  { key: "startTime", label: "開始", question: "開始時間を入力してください。例: 19:00" },
+  { key: "endTime", label: "終了", question: "終了時間を入力してください。未定なら「スキップ」で大丈夫です。", optional: true },
+  { key: "pattern", label: "パターン", question: "開催パターンを教えてください。例: 単発、毎週、第2週、最終週" },
+  { key: "note", label: "備考", question: "備考があれば入力してください。なければ「スキップ」で大丈夫です。", optional: true },
+];
 
 function loadState() {
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -99,6 +117,14 @@ function loadState() {
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function createChatState() {
+  return {
+    stepIndex: 0,
+    draft: {},
+    complete: false,
+  };
 }
 
 function formatDate(dateString) {
@@ -122,6 +148,84 @@ function getStatusBadge(status) {
   badge.className = `status-badge status-${status}`;
   badge.textContent = statusLabels[status];
   return badge;
+}
+
+function addChatMessage(role, text) {
+  const message = document.createElement("div");
+  message.className = `chat-message chat-message--${role}`;
+  message.textContent = text;
+  chatMessages.append(message);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function renderChatDraft() {
+  const entries = chatSteps
+    .filter((step) => chatState.draft[step.key])
+    .map((step) => `<strong>${step.label}</strong>: ${chatState.draft[step.key]}`);
+
+  chatDraft.innerHTML = entries.length
+    ? `下書き ${entries.join(" / ")}`
+    : "下書きはまだありません。";
+}
+
+function askCurrentChatStep() {
+  const step = chatSteps[chatState.stepIndex];
+  if (!step) {
+    addChatMessage("kamo", "この内容で投稿一覧に入れます。「登録」と入力すると投稿済みで追加します。修正したい場合は「最初から」を押してください。");
+    chatState.complete = true;
+    return;
+  }
+  addChatMessage("kamo", step.question);
+}
+
+function normalizeChatValue(step, value) {
+  const trimmed = value.trim();
+  if (step.optional && ["skip", "スキップ", "なし", "未定"].includes(trimmed.toLowerCase())) {
+    return "";
+  }
+  if (step.key === "date") {
+    const normalized = trimmed.replaceAll("/", "-");
+    return /^\d{4}-\d{2}-\d{2}$/.test(normalized) ? normalized : trimmed;
+  }
+  if (["startTime", "endTime"].includes(step.key)) {
+    const match = trimmed.match(/^(\d{1,2})[:：](\d{2})$/);
+    if (!match) return trimmed;
+    return `${match[1].padStart(2, "0")}:${match[2]}`;
+  }
+  return trimmed;
+}
+
+function createMeetingFromChat() {
+  const draft = chatState.draft;
+  const meeting = {
+    id: `chat-${Date.now()}`,
+    submitter: draft.submitter || "",
+    organization: draft.organization || "",
+    meetingName: draft.meetingName || "",
+    venue: draft.venue || "",
+    address: draft.address || "",
+    date: draft.date || "",
+    startTime: draft.startTime || "",
+    endTime: draft.endTime || "",
+    pattern: draft.pattern || "単発",
+    status: "submitted",
+    note: draft.note || "かもちゃんチャットから登録",
+  };
+
+  state.meetings.push(meeting);
+  state.lastTemplate = meeting;
+  selectedTableIds.add(meeting.id);
+  saveState();
+  renderAll();
+  addChatMessage("kamo", "投稿済みとして一覧に追加しました。確認できたら「確約」にしてください。");
+}
+
+function resetChat() {
+  chatState = createChatState();
+  chatMessages.innerHTML = "";
+  addChatMessage("kamo", "こんにちは、かもちゃんです。例会情報を一つずつ聞いて登録します。");
+  renderChatDraft();
+  askCurrentChatStep();
 }
 
 function getDateKey(date) {
@@ -461,6 +565,32 @@ document.querySelector("#copyJsonButton").addEventListener("click", async (event
   }, 1400);
 });
 
+chatForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const value = chatInput.value.trim();
+  if (!value) return;
+  chatInput.value = "";
+  addChatMessage("user", value);
+
+  if (chatState.complete) {
+    if (["登録", "はい", "OK", "ok"].includes(value)) {
+      createMeetingFromChat();
+      resetChat();
+    } else {
+      addChatMessage("kamo", "登録する場合は「登録」と入力してください。");
+    }
+    return;
+  }
+
+  const step = chatSteps[chatState.stepIndex];
+  chatState.draft[step.key] = normalizeChatValue(step, value);
+  chatState.stepIndex += 1;
+  renderChatDraft();
+  askCurrentChatStep();
+});
+
+document.querySelector("#chatResetButton").addEventListener("click", resetChat);
+
 document.querySelector("#prevMonthButton").addEventListener("click", () => {
   calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() - 1, 1);
   renderCalendar();
@@ -484,3 +614,4 @@ statusFilter.addEventListener("change", renderList);
 searchInput.addEventListener("input", renderList);
 
 renderAll();
+resetChat();
