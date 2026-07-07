@@ -52,6 +52,22 @@
           </div>
         </section>
 
+        <section class="chat-panel" aria-label="かもちゃんチャット登録">
+          <div class="chat-panel__header">
+            <div>
+              <h2>かもちゃんと登録</h2>
+              <p>順番に答えると、投稿データを作れます。</p>
+            </div>
+            <button class="small-button" id="chatResetButton" type="button">最初から</button>
+          </div>
+          <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
+          <form class="chat-input" id="chatForm">
+            <input id="chatInput" autocomplete="off" placeholder="ここに入力">
+            <button class="primary-button" type="submit">送信</button>
+          </form>
+          <div class="chat-draft" id="chatDraft"></div>
+        </section>
+
         <details class="panel direct-input" id="directInputPanel">
           <summary>
             <span>フォーム直接入力</span>
