@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>断酒でGOGO 試作</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">断酒でGO!!GO!! 試作</p>
+        <h1>例会情報の登録・確認・印刷</h1>
+      </div>
+      <div class="topbar__actions">
+        <button class="icon-button" id="printButton" type="button" aria-label="印刷" title="印刷">P</button>
+        <button class="icon-button" id="resetButton" type="button" aria-label="試作データに戻す" title="試作データに戻す">R</button>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <section class="workspace">
+        <nav class="tabs" aria-label="表示切替">
+          <button class="tab is-active" data-tab="list" type="button">Web一覧</button>
+          <button class="tab" data-tab="table" type="button">HTML表</button>
+          <button class="tab" data-tab="calendar" type="button">カレンダー</button>
+          <button class="tab" data-tab="export" type="button">本体連携</button>
+        </nav>
+
+        <section class="file-strip" aria-label="ファイル選択">
+          <div>
+            <h2>ファイルから登録</h2>
+            <p>PDF、Excel、Word、CSVを選んで登録準備します。</p>
+          </div>
+          <div class="file-actions">
+            <label class="file-button">
+              PDF
+              <input type="file" accept="application/pdf">
+            </label>
+            <label class="file-button">
+              Excel
+              <input type="file" accept=".xls,.xlsx,.csv">
+            </label>
+            <label class="file-button">
+              Word
+              <input type="file" accept=".doc,.docx">
+            </label>
+            <label class="file-button">
+              テキスト
+              <input type="file" accept=".txt,.csv,.tsv,text/plain">
+            </label>
+          </div>
+        </section>
+
+        <details class="panel direct-input" id="directInputPanel">
+          <summary>
+            <span>フォーム直接入力</span>
+          </summary>
+
+          <div class="direct-input__actions">
+            <button class="small-button" id="loadLastButton" type="button">前回呼び出し</button>
+          </div>
+
+          <form id="meetingForm" class="form-grid">
+            <label>
+              投稿者
+              <input name="submitter" autocomplete="name" required>
+            </label>
+            <label>
+              団体
+              <input name="organization" required>
+            </label>
+            <label>
+              例会名
+              <input name="meetingName" required>
+            </label>
+            <label>
+              会場
+              <input name="venue" required>
+            </label>
+            <label class="span-2">
+              住所
+              <input name="address">
+            </label>
+            <label>
+              日付
+              <input name="date" type="date" required>
+            </label>
+            <label>
+              開始
+              <input name="startTime" type="time" required>
+            </label>
+            <label>
+              終了
+              <input name="endTime" type="time">
+            </label>
+            <label>
+              パターン
+              <select name="pattern">
+                <option>単発</option>
+                <option>毎週</option>
+                <option>第1週</option>
+                <option>第2週</option>
+                <option>第3週</option>
+                <option>第4週</option>
+                <option>最終週</option>
+              </select>
+            </label>
+            <label>
+              状態
+              <select name="status">
+                <option value="submitted">投稿済み</option>
+                <option value="reviewing">確認中</option>
+                <option value="confirmed">確約済み</option>
+                <option value="synced">本体反映済み</option>
+              </select>
+            </label>
+            <label class="span-2">
+              備考
+              <textarea name="note" rows="3"></textarea>
+            </label>
+            <div class="form-actions span-2">
+              <button class="primary-button" type="submit">登録する</button>
+              <button class="ghost-button" id="duplicateButton" type="button">選択中を複製</button>
+            </div>
+          </form>
+        </details>
+
+        <section class="summary-grid" id="summaryGrid" aria-label="状態別件数"></section>
+
+        <section class="tab-panel is-active" id="listPanel">
+          <div class="toolbar">
+            <label>
+              状態
+              <select id="statusFilter">
+                <option value="all">すべて</option>
+                <option value="submitted">投稿済み</option>
+                <option value="reviewing">確認中</option>
+                <option value="confirmed">確約済み</option>
+                <option value="synced">本体反映済み</option>
+              </select>
+            </label>
+            <label>
+              検索
+              <input id="searchInput" type="search" placeholder="団体・例会・会場">
+            </label>
+          </div>
+          <div class="view-note" id="listNote"></div>
+          <div class="list" id="submissionList"></div>
+        </section>
+
+        <section class="tab-panel" id="tablePanel">
+          <div class="table-actions">
+            <div>
+              <h2>HTML表</h2>
+              <p>GOGO上の表示範囲は翌月末までです。</p>
+            </div>
+            <div class="table-actions__buttons">
+              <button class="small-button" id="selectAllTableButton" type="button">全選択</button>
+              <button class="primary-button" id="printSelectedButton" type="button">選択分を印刷</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>印刷</th>
+                  <th>日付</th>
+                  <th>時間</th>
+                  <th>団体</th>
+                  <th>例会</th>
+                  <th>会場</th>
+                  <th>住所</th>
+                  <th>状態</th>
+                </tr>
+              </thead>
+              <tbody id="meetingTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="calendarPanel">
+          <div class="calendar-toolbar">
+            <button class="small-button" id="prevMonthButton" type="button">前月</button>
+            <strong id="calendarTitle"></strong>
+            <button class="small-button" id="nextMonthButton" type="button">翌月</button>
+          </div>
+          <div class="calendar" id="calendarGrid"></div>
+        </section>
+
+        <section class="tab-panel" id="exportPanel">
+          <div class="export-layout">
+            <div>
+              <h2>断酒でGO本体へ渡すデータ</h2>
+              <p>確約済み・本体反映済みだけを対象にした試作用JSONです。</p>
+            </div>
+            <button class="primary-button" id="copyJsonButton" type="button">JSONをコピー</button>
+          </div>
+          <pre id="exportJson" class="json-output"></pre>
+        </section>
+      </section>
+    </main>
+
+    <template id="submissionTemplate">
+      <article class="submission">
+        <div>
+          <p class="submission__date"></p>
+          <h3></h3>
+          <p class="submission__meta"></p>
+          <dl class="submission__details"></dl>
+        </div>
+        <div class="submission__actions">
+          <select class="status-select" aria-label="状態変更"></select>
+          <button class="small-button confirm-button" type="button">確約</button>
+          <button class="small-button edit-button" type="button">編集</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
