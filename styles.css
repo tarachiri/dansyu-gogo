@@ -255,6 +255,81 @@ textarea {
   cursor: pointer;
 }
 
+.chat-panel {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: white;
+}
+
+.chat-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.chat-panel__header h2,
+.chat-panel__header p {
+  margin: 0;
+}
+
+.chat-panel__header p {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.chat-messages {
+  display: grid;
+  gap: 8px;
+  max-height: 260px;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8faf7;
+}
+
+.chat-message {
+  max-width: min(82%, 720px);
+  padding: 10px 12px;
+  border-radius: 8px;
+  line-height: 1.55;
+  font-size: 14px;
+}
+
+.chat-message--kamo {
+  justify-self: start;
+  background: var(--green-2);
+  color: var(--green);
+}
+
+.chat-message--user {
+  justify-self: end;
+  background: #ddeaf5;
+  color: var(--blue);
+}
+
+.chat-input {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.chat-draft {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.chat-draft strong {
+  color: var(--green);
+}
+
 .direct-input {
   box-shadow: none;
 }
@@ -585,7 +660,9 @@ th {
   .submission__actions,
   .export-layout,
   .table-actions,
-  .table-actions__buttons {
+  .table-actions__buttons,
+  .chat-panel__header,
+  .chat-input {
     display: grid;
     grid-template-columns: 1fr;
   }
@@ -603,6 +680,7 @@ th {
   .topbar,
   .tabs,
   .file-strip,
+  .chat-panel,
   .direct-input,
   .summary-grid,
   .toolbar,
