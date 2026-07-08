@@ -255,11 +255,12 @@ textarea {
 }
 
 .chat-panel {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 14px;
+  padding: 18px;
   background: white;
+  box-shadow: var(--shadow);
 }
 
 .chat-panel__header {
@@ -275,10 +276,14 @@ textarea {
   margin: 0;
 }
 
+.chat-panel__header h2 {
+  font-size: 22px;
+}
+
 .chat-panel__header p {
-  margin-top: 4px;
+  margin-top: 6px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .chat-messages {
@@ -294,10 +299,10 @@ textarea {
 
 .chat-message {
   max-width: min(82%, 720px);
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-radius: 8px;
   line-height: 1.55;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .chat-message--kamo {
@@ -322,7 +327,7 @@ textarea {
 .chat-draft {
   margin-top: 10px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .chat-draft strong {
