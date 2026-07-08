@@ -213,7 +213,6 @@ textarea {
   grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
   gap: 14px;
   align-items: center;
-  margin-top: 12px;
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -256,7 +255,7 @@ textarea {
 }
 
 .chat-panel {
-  margin-top: 12px;
+  margin-bottom: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 14px;
@@ -330,38 +329,58 @@ textarea {
   color: var(--green);
 }
 
-.direct-input {
-  box-shadow: none;
-}
-
-.direct-input summary {
+.direct-input__actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 42px;
-  cursor: pointer;
-  color: var(--green);
-  font-weight: 800;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
-.direct-input summary::after {
-  content: "開く";
+.direct-input__actions h2 {
+  margin: 0;
+}
+
+#dataPanel .file-strip {
+  margin-bottom: 14px;
+}
+
+.data-test-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+}
+
+.data-test-panel h2,
+.data-test-panel p {
+  margin: 0;
+}
+
+.data-test-panel p {
+  margin-top: 4px;
   color: var(--muted);
   font-size: 13px;
 }
 
-.direct-input[open] summary {
-  margin-bottom: 10px;
+#formPanel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: white;
 }
 
-.direct-input[open] summary::after {
-  content: "閉じる";
+#listPanel .table-actions {
+  margin-top: 16px;
 }
 
-.direct-input__actions {
-  display: flex;
+.form-actions {
   justify-content: flex-end;
-  margin-bottom: 10px;
 }
 
 .summary-grid {
@@ -661,6 +680,7 @@ th {
   .export-layout,
   .table-actions,
   .table-actions__buttons,
+  .data-test-panel,
   .chat-panel__header,
   .chat-input {
     display: grid;
@@ -681,15 +701,15 @@ th {
   .tabs,
   .file-strip,
   .chat-panel,
-  .direct-input,
   .summary-grid,
   .toolbar,
   .calendar-toolbar,
   .export-layout,
+  .data-test-panel,
   .table-actions,
-  #listPanel,
   #calendarPanel,
-  #exportPanel {
+  #dataPanel,
+  #formPanel {
     display: none !important;
   }
 
@@ -707,12 +727,14 @@ th {
     box-shadow: none;
   }
 
-  .tab-panel {
-    display: none;
+  #listPanel {
+    display: block;
   }
 
-  #tablePanel {
-    display: block;
+  #listPanel .list,
+  #listPanel .toolbar,
+  #listPanel .view-note {
+    display: none !important;
   }
 
   body.print-selected tr.is-unselected {
