@@ -82,12 +82,14 @@ const searchInput = document.querySelector("#searchInput");
 const calendarGrid = document.querySelector("#calendarGrid");
 const calendarTitle = document.querySelector("#calendarTitle");
 const exportJson = document.querySelector("#exportJson");
-const directInputPanel = document.querySelector("#directInputPanel");
 const listNote = document.querySelector("#listNote");
 const chatMessages = document.querySelector("#chatMessages");
 const chatForm = document.querySelector("#chatForm");
 const chatInput = document.querySelector("#chatInput");
 const chatDraft = document.querySelector("#chatDraft");
+const formTabButton = document.querySelector('[data-tab="form"]');
+const listTabButton = document.querySelector('[data-tab="list"]');
+const importProductionButton = document.querySelector("#importProductionButton");
 
 const chatSteps = [
   { key: "submitter", label: "投稿者", question: "まず投稿者のお名前を教えてください。" },
@@ -220,6 +222,32 @@ function createMeetingFromChat() {
   addChatMessage("kamo", "投稿済みとして一覧に追加しました。確認できたら「確約」にしてください。");
 }
 
+async function importProductionTestData() {
+  importProductionButton.textContent = "読み込み中";
+  importProductionButton.disabled = true;
+  try {
+    const response = await fetch("./production-test-data.json", { cache: "no-store" });
+    if (!response.ok) throw new Error("failed to fetch production-test-data.json");
+    const productionMeetings = await response.json();
+    state.meetings = [
+      ...state.meetings.filter((meeting) => meeting.source !== "production-test"),
+      ...productionMeetings,
+    ];
+    selectedTableIds = new Set(state.meetings.map((meeting) => meeting.id));
+    saveState();
+    renderAll();
+    listTabButton.click();
+    importProductionButton.textContent = `${productionMeetings.length}件投入済み`;
+  } catch {
+    importProductionButton.textContent = "読み込み失敗";
+  } finally {
+    setTimeout(() => {
+      importProductionButton.textContent = "テスト投入";
+      importProductionButton.disabled = false;
+    }, 1800);
+  }
+}
+
 function resetChat() {
   chatState = createChatState();
   chatMessages.innerHTML = "";
@@ -321,7 +349,7 @@ function renderList() {
     });
 
     node.querySelector(".edit-button").addEventListener("click", () => {
-      directInputPanel.open = true;
+      formTabButton.click();
       fillForm(meeting);
       selectedId = meeting.id;
     });
@@ -511,7 +539,7 @@ form.addEventListener("submit", (event) => {
 });
 
 document.querySelector("#loadLastButton").addEventListener("click", () => {
-  directInputPanel.open = true;
+  formTabButton.click();
   fillForm(state.lastTemplate || seedMeetings[0]);
   selectedId = null;
 });
@@ -521,7 +549,7 @@ document.querySelector("#duplicateButton").addEventListener("click", () => {
     ? state.meetings.find((meeting) => meeting.id === selectedId)
     : state.lastTemplate;
   if (!source) return;
-  directInputPanel.open = true;
+  formTabButton.click();
   fillForm({ ...source, id: "", status: "submitted" });
   selectedId = null;
 });
@@ -535,7 +563,7 @@ document.querySelector("#resetButton").addEventListener("click", () => {
 });
 
 document.querySelector("#printButton").addEventListener("click", () => {
-  document.querySelector('[data-tab="table"]').click();
+  listTabButton.click();
   window.print();
 });
 
@@ -546,7 +574,7 @@ document.querySelector("#selectAllTableButton").addEventListener("click", () => 
 
 document.querySelector("#printSelectedButton").addEventListener("click", () => {
   document.body.classList.add("print-selected");
-  document.querySelector('[data-tab="table"]').click();
+  listTabButton.click();
   window.print();
   setTimeout(() => {
     document.body.classList.remove("print-selected");
@@ -590,6 +618,7 @@ chatForm.addEventListener("submit", (event) => {
 });
 
 document.querySelector("#chatResetButton").addEventListener("click", resetChat);
+importProductionButton.addEventListener("click", importProductionTestData);
 
 document.querySelector("#prevMonthButton").addEventListener("click", () => {
   calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() - 1, 1);
