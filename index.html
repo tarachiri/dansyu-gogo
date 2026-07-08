@@ -19,23 +19,23 @@
     </header>
 
     <main class="app-shell">
-      <section class="workspace">
-        <section class="chat-panel" aria-label="かもちゃんチャット登録">
-          <div class="chat-panel__header">
-            <div>
-              <h2>かもちゃんと登録</h2>
-              <p>順番に答えると、投稿データを作れます。</p>
-            </div>
-            <button class="small-button" id="chatResetButton" type="button">最初から</button>
+      <section class="chat-panel" aria-label="かもちゃんチャット登録">
+        <div class="chat-panel__header">
+          <div>
+            <h2>かもちゃんと登録</h2>
+            <p>順番に答えると、投稿データを作れます。</p>
           </div>
-          <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
-          <form class="chat-input" id="chatForm">
-            <input id="chatInput" autocomplete="off" placeholder="ここに入力">
-            <button class="primary-button" type="submit">送信</button>
-          </form>
-          <div class="chat-draft" id="chatDraft"></div>
-        </section>
+          <button class="small-button" id="chatResetButton" type="button">最初から</button>
+        </div>
+        <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
+        <form class="chat-input" id="chatForm">
+          <input id="chatInput" autocomplete="off" placeholder="ここに入力">
+          <button class="primary-button" type="submit">送信</button>
+        </form>
+        <div class="chat-draft" id="chatDraft"></div>
+      </section>
 
+      <section class="workspace">
         <nav class="tabs" aria-label="表示切替">
           <button class="tab is-active" data-tab="list" type="button">Web一覧・HTML表</button>
           <button class="tab" data-tab="calendar" type="button">カレンダー</button>
