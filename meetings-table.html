@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>meetings HTML表 | 断酒でGOGO 試作</title>
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./meetings-table.css">
+  </head>
+  <body class="db-page">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">断酒でGO!!GO!! 試作</p>
+        <h1>meetings HTML表</h1>
+      </div>
+      <div class="topbar__actions">
+        <button class="icon-button" id="tablePrintButton" type="button" aria-label="印刷" title="印刷">P</button>
+        <a class="small-button back-link" href="./index.html">戻る</a>
+      </div>
+    </header>
+
+    <main class="db-shell">
+      <section class="db-toolbar" aria-label="meetings 表示条件">
+        <div class="db-toolbar__summary">
+          <strong id="dbCount">0件</strong>
+          <span>登録済みの meetings をカラムごとに表示します。</span>
+        </div>
+        <label>
+          状態
+          <select id="dbStatusFilter">
+            <option value="all">すべて</option>
+            <option value="submitted">投稿済み</option>
+            <option value="reviewing">確認中</option>
+            <option value="confirmed">確約済み</option>
+            <option value="synced">本体反映済み</option>
+          </select>
+        </label>
+        <label>
+          検索
+          <input id="dbSearchInput" type="search" placeholder="団体・例会・会場・住所">
+        </label>
+      </section>
+
+      <section class="db-table-panel" aria-label="meetings HTML表">
+        <div class="db-table-wrap">
+          <table class="db-table">
+            <thead>
+              <tr>
+                <th>id</th>
+                <th>状態</th>
+                <th>日付</th>
+                <th>開始</th>
+                <th>終了</th>
+                <th>団体</th>
+                <th>例会名</th>
+                <th>会場</th>
+                <th>住所</th>
+                <th>投稿者</th>
+                <th>パターン</th>
+                <th>備考</th>
+                <th>source</th>
+              </tr>
+            </thead>
+            <tbody id="dbTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="./meetings-table.js"></script>
+  </body>
+</html>
